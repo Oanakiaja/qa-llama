@@ -2,14 +2,16 @@ from typing import Union
 
 from fastapi import FastAPI
 
+from chain import invoke_llama3
+
 app = FastAPI()
 
 
 @app.get("/")
 async def read_root():
-    return {"Hello": "World"}
+    return {"Hello": "llama3"}
 
 
-@app.get("/items/{item_id}")
-async def read_item(item_id: int, q: Union[str, None] = None):
-    return {"item_id": item_id, "q": q}
+@app.get("/invoke/{message}")
+async def invoke(message: Union[str, None] = None):
+    return invoke_llama3(message)
