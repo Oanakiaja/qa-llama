@@ -1,5 +1,5 @@
 #!/bin/bash
 
-cd llm-server
+cd backend
 
-uvicorn main:app --reload
+uvicorn main:app  --reload

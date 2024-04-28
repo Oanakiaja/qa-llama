@@ -11,7 +11,7 @@ conda activate gitllama
 conda install pip
 
 # python server
-cd ./llm-server
+cd ./backend
 pip install -r ./requirements.txt
 
 # web server 

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { atom, useAtom, useSetAtom } from "jotai";
 import { ChangeEvent } from "react";
-import { invoke } from "@/app/actions/invoke";
+import { qa } from "@/app/actions/agent";
 import { ContentAtom } from "./Chat";
 import { useState } from "react";
 
@@ -14,6 +14,7 @@ const PlaceHolder = "gitllama";
 export function RepoSearcher() {
   const [repo, setRepo] = useAtom(RepoAtom);
   const setContent = useSetAtom(ContentAtom);
+
   const [loading, setLoading] = useState(false);
 
   const handleInput = (event: ChangeEvent<HTMLInputElement>) => {
@@ -28,9 +29,12 @@ export function RepoSearcher() {
 
     try {
       setLoading(true);
-      const response = await invoke(str(repo));
+      const response = await qa({ session: "mock", question: str(repo) });
 
-      setContent(response);
+      setContent(response.answer);
+
+      console.log("[context]:");
+      console.log(response.context);
     } finally {
       setLoading(false);
     }

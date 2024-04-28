@@ -2,4 +2,6 @@
 
 cd web
 
-pnpm dev
+echo "[nodejs version]: $(node -v)"
+
+npx pnpm dev
