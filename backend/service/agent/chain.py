@@ -1,6 +1,7 @@
 from langchain_core.chat_history import BaseChatMessageHistory
 from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_core.runnables.history import RunnableWithMessageHistory
+from langchain_core.runnables import RunnableParallel, RunnablePassthrough
 
 
 from langchain.chains.combine_documents import create_stuff_documents_chain
@@ -12,9 +13,9 @@ from .retrieval import Retriever
 from .llm import ChatModel
 
 
-retriever = Retriever(
-    doc_sources=["https://lilianweng.github.io/posts/2023-06-23-agent"],
-    embeddingModel="llama3").as_retriever()
+retrieval_client = Retriever(embeddingModel="llama3")
+
+retriever = retrieval_client.as_retriever()
 llm = ChatModel.ollama('llama3')
 
 # Create history-aware retriever chain

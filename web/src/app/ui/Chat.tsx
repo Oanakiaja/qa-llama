@@ -25,7 +25,7 @@ function textToHtml(text: string) {
 }
 
 const Chat = () => {
-  const content = useAtomValue(ContentAtom) || '';
+  const content = useAtomValue(ContentAtom) || "";
 
   return (
     <div
