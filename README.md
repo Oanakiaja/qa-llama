@@ -1,6 +1,8 @@
 # gitllama
 
-A github repo reader powered by llm.
+> but now it's a  Q&A **local** program powered by `ollama` `llama3` `chromadb`.
+
+A github repo reader powered by llm. (wip)
 
 ## setup
 

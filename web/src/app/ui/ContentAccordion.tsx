@@ -7,6 +7,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { stopPropagation } from "@/utils";
 import { getDefaultStore, useAtom, useAtomValue } from "jotai";
 import { atomWithDefault } from "jotai/utils";
 
@@ -43,13 +44,13 @@ export const ContentAccordion = () => {
     <Accordion type="multiple" value={computedKeys}>
       <AccordionItem value="References" onClick={triggerItem("References")}>
         <AccordionTrigger>References</AccordionTrigger>
-        <AccordionContent>
+        <AccordionContent onClick={stopPropagation}>
           <References />
         </AccordionContent>
       </AccordionItem>
       <AccordionItem value="Content" onClick={triggerItem("Content")}>
         <AccordionTrigger>Content</AccordionTrigger>
-        <AccordionContent>
+        <AccordionContent onClick={stopPropagation}>
           <Chat />
         </AccordionContent>
       </AccordionItem>

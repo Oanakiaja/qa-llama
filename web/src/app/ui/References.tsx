@@ -16,11 +16,11 @@ const References = () => {
   const references = useAtomValue(ReferencesAtom) || [];
 
   return (
-    <div className="flex space-x-2 w-full flex-wrap">
+    <div className="flex w-full flex-wrap">
       {references?.map?.((reference, idx) => (
         <HoverCard key={idx}>
           <HoverCardTrigger asChild>
-            <Button variant="link" onClick={(e) => e.stopPropagation()}>
+            <Button variant="link">
               <a href={reference.source}>{reference.source}</a>
             </Button>
           </HoverCardTrigger>
