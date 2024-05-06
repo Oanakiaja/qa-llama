@@ -7,28 +7,46 @@ import { streaming_qa } from "@/app/actions/client/agent";
 import { abortSignal, type FetchOptions } from "@/app/actions/client/fetch";
 import { ContentAtom } from "./Chat";
 import { useState } from "react";
+import { ReferencesAtom } from "./References";
 // import { qa } from "../actions/server/agent";
 
 const QAAtom = atom("");
 
 const PlaceHolder = "Agent System Overview";
 
+const safeParse = (str: string) => {
+  try {
+    return JSON.parse(str);
+  } catch (err) {
+    return null;
+  }
+};
+
 export const useStreamingQA = () => {
   const [loading, setLoading] = useState(false);
   const setContent = useSetAtom(ContentAtom);
-  const appendStreamingResp = (message: string) => {
-    setContent((prevContent) => (prevContent ?? "") + message);
+  const setReferences = useSetAtom(ReferencesAtom);
+
+  const handleSSECallback = (type: string, message: string) => {
+    if (type === "references") {
+      const references = safeParse(message);
+      setReferences(references || []);
+    } else if (type === "content") {
+      setContent((prevContent) => (prevContent ?? "") + message);
+    }
   };
+
   const streamingQA = async (params: { session: string; question: string }) => {
-    setContent("")
+    setContent("");
+    setReferences([]);
     await streaming_qa(params, {
       setLoading,
-      appendStreamingResp
+      handleSSECallback,
     });
   };
 
   const abortFetch = () => {
-    abortSignal()
+    abortSignal();
     setLoading(false);
   };
 

@@ -1,10 +1,13 @@
+from typing import List
+from service.agent.utils import escape_str
 from service.agent.invoke import QAAnswer, invoke_llama3, astream_invoke_llama3
 from service.agent.chain import retrieval_client
 from pydantic import BaseModel
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.responses import StreamingResponse
 from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
+from langchain_core.documents import Document
 
 load_dotenv()
 
@@ -42,24 +45,39 @@ async def invoke(bodyModel: QaReqBody):
     return invoke_llama3(session, question)
 
 
-@app.post("/astream/qa", response_model=QAAnswer)
-async def invoke_streaming(bodyModel: QaReqBody, req: Request):
+@app.post("/astream/qa")
+async def invoke_streaming(bodyModel: QaReqBody):
     body = bodyModel.model_dump()
     session = body['session']
     question = body['question']
 
     print('start chain')
+
     astream = astream_invoke_llama3(session, question)
 
     async def event_generator():
         # {'input': 'xx'}
         # {'chat_history': []}
-        # {'context: [Document()]}
+        # {'context: [Document(page_content:str, metadata{source: str})]}
         # {'answer': 'xxx'}
         async for chunk in astream:
-            answer = chunk.get('answer')
-            if 'answer' in chunk:
-                yield "data: {\"message\": \"" + answer + "\"}" + "\n\n"
+            if 'context' in chunk:
+                documents: List[Document] = chunk.get('context')
+                msg = 'event:references\ndata:[{docs}]\n\n'
+                docs = ""
+
+                for doc in documents:
+                    source = escape_str(doc.metadata.get("source"))
+                    content = escape_str(doc.page_content)
+                    if source == None or content == None:
+                        continue;
+                    docs += "{" + f'"source": {source}, "content": {content}' + "},"
+                docs = docs[:-1]
+                yield msg.replace("{docs}", docs)
+
+            elif 'answer' in chunk:
+                answer = chunk.get('answer')
+                yield f'event:content\ndata:{answer}\n\n'
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")
 
@@ -73,3 +91,8 @@ async def load_doc(bodyModel: LoadRepoReqBody):
     body = bodyModel.model_dump()
     repo = body['repo']
     retrieval_client.load_doc([repo])
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)

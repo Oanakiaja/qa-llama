@@ -14,16 +14,16 @@ const createSignal = () => {
 };
 
 export const abortSignal = () => {
-  try{
+  try {
     controller?.abort?.();
-  }catch(e){
-    console.log('abort signal error:', e);
+  } catch (e) {
+    console.log("abort signal error:", e);
   }
 };
 
 export type FetchOptions = {
   setLoading?: (loading: boolean) => void;
-  appendStreamingResp?: (chunk: string) => void;
+  handleSSECallback?: (type: string, content: string) => void;
 };
 
 export const clientFetchApi =
@@ -39,7 +39,7 @@ export const clientFetchApi =
       url += `?${new URLSearchParams(JSON.stringify(body))}`;
     }
 
-    const { appendStreamingResp, setLoading } = options || {};
+    const { handleSSECallback, setLoading } = options || {};
 
     setLoading?.(true);
     const response = await fetch(url, {
@@ -74,7 +74,7 @@ export const clientFetchApi =
       throw "[error]: python server!";
     }
     try {
-      await handleSSE(response, appendStreamingResp);
+      await handleSSE(response, handleSSECallback);
     } finally {
       setLoading?.(false);
     }
@@ -82,7 +82,7 @@ export const clientFetchApi =
 
 const handleSSE = async (
   response: Response,
-  handler?: (chunk: string) => void | undefined
+  handler?: (type: string, content: string) => void | undefined
 ) => {
   const reader = response!.body!.getReader();
   const decoder = new TextDecoder();
@@ -93,12 +93,15 @@ const handleSSE = async (
     }
     const str = decoder.decode(value);
     try {
-      // Adjusting for SSE format by stripping 'data: ' prefix and trimming any remaining whitespace
-      const jsonStr = str.replace(/^data: /, "").trim();
-      const newMessage = JSON.parse(jsonStr);
-      handler?.(newMessage.message);
+      const [type, content] = parseSSEEvent(str);
+      handler?.(type, content);
     } catch (error) {
       console.error("Error parsing message:", error);
     }
   }
+};
+
+const parseSSEEvent = (str: string) => {
+  const [_, type, content] = str.match(/^event:(.*)\ndata:(.*)\n\n$/s) || [];
+  return [type, content];
 };
