@@ -1,15 +1,13 @@
 import { RepoSearcher } from "@/app/ui/RepoSearcher";
-import Chat from "@/app/ui/Chat";
-import { RepoLoader } from "./ui/RepoLoader";
-import References from "./ui/References";
+import { RepoLoader } from "@/app/ui/RepoLoader";
+import { ContentAccordion } from "@/app/ui/ContentAccordion";
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
+    <main className="flex min-h-screen flex-col p-24">
       <RepoLoader />
       <RepoSearcher />
-      <References />
-      <Chat />
+      <ContentAccordion />
     </main>
   );
 }

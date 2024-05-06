@@ -1,30 +1,43 @@
 "use client";
 import { atom, useAtomValue } from "jotai";
+import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
+import { atomWithStorage } from "jotai/utils";
 
-export const ReferencesAtom = atom<{ source: string; content: string }[]>([]);
+export const ReferencesAtom = atomWithStorage<
+  { source: string; content: string }[]
+>("references", []);
 
 const References = () => {
   const references = useAtomValue(ReferencesAtom) || [];
 
   return (
-    <div className="flex">
-      {references.map((reference, idx) => (
-        <Card key={idx}>
-          <CardHeader>
-            <CardTitle>
+    <div className="flex space-x-2 w-full flex-wrap">
+      {references?.map?.((reference, idx) => (
+        <HoverCard key={idx}>
+          <HoverCardTrigger asChild>
+            <Button variant="link" onClick={(e) => e.stopPropagation()}>
               <a href={reference.source}>{reference.source}</a>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p>{reference.content}</p>
-          </CardContent>
-        </Card>
+            </Button>
+          </HoverCardTrigger>
+          <HoverCardContent className="w-80">
+            <div className="flex justify-between space-x-4">
+              <div className="space-y-1">
+                <h4 className="text-sm font-semibold">{reference.source}</h4>
+                <p className="text-sm">{reference.content}</p>
+                <div className="flex items-center pt-2">
+                  <span className="text-xs text-muted-foreground">
+                    TODO: meta info
+                  </span>
+                </div>
+              </div>
+            </div>
+          </HoverCardContent>
+        </HoverCard>
       ))}
     </div>
   );

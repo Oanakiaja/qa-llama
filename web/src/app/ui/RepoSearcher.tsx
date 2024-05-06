@@ -8,7 +8,7 @@ import { abortSignal, type FetchOptions } from "@/app/actions/client/fetch";
 import { ContentAtom } from "./Chat";
 import { useState } from "react";
 import { ReferencesAtom } from "./References";
-// import { qa } from "../actions/server/agent";
+import { toggleComputedKeys } from "./ContentAccordion";
 
 const QAAtom = atom("");
 
@@ -31,8 +31,10 @@ export const useStreamingQA = () => {
     if (type === "references") {
       const references = safeParse(message);
       setReferences(references || []);
+      references && toggleComputedKeys("References", true);
     } else if (type === "content") {
       setContent((prevContent) => (prevContent ?? "") + message);
+      toggleComputedKeys("Content", true);
     }
   };
 
@@ -70,7 +72,7 @@ export function RepoSearcher() {
   };
 
   return (
-    <div className="flex w-full max-w-md items-center space-x-2">
+    <div className="flex w-full max-w-xl items-center space-x-2 self-center">
       <Input type="url" placeholder={PlaceHolder} onChange={handleInput} />
       <Button type="submit" onClick={handleSubmit} loading={loading}>
         Ask!

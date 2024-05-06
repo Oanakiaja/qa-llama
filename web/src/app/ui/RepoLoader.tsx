@@ -35,7 +35,7 @@ export function RepoLoader() {
   };
 
   return (
-    <div className="flex w-full max-w-md items-center space-x-2 my-4">
+    <div className="flex w-full  max-w-xl items-center space-x-2 my-4 self-center">
       <Input type="url" placeholder={PlaceHolder} onChange={handleInput} />
       <Button type="submit" onClick={handleSubmit} loading={loading}>
         Load ~
