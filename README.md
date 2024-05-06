@@ -68,7 +68,6 @@ conda activate gitllama
 
 - [ ] 自定义chain
 - [ ] 自定义 stream 输出
-- [ ] 实现答案 References ，提供相关文档链接
 - [ ] 实现会话 和 连续提问
 
 ### git 功能
